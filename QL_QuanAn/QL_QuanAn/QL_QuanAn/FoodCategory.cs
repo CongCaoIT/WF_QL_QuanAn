@@ -194,7 +194,6 @@ namespace QL_QuanAn
             }
         }
 
-
         private void dtgvFoodCategory_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             try
@@ -361,9 +360,8 @@ namespace QL_QuanAn
         private void cbFoodCategoryName_SelectedIndexChanged(object sender, EventArgs e)
         {
             int foodcategoryid = GetFoodCategoryIdFromComboBox(cbFoodCategoryName);
-
-            // Thực hiện tìm kiếm dựa trên mức lương
-            LoadListFood();
+           
+            LoadListFood(); 
             foodlist.DataSource = SearchFoodByFoodCategoryName(foodcategoryid);
         }
         #endregion EV_FoodCategory

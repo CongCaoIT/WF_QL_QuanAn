@@ -456,9 +456,7 @@ namespace QL_QuanAn
             if (Check == "Có")
             {
                 try
-                {
-                    BillInfoDAO.Instance.DeleteBillInfoByFoodId(foodid);
-                    FoodRecipesDAO.Instance.DeleteFoodRecipesByFoodId(foodid);
+                {                   
                     if (FoodDAO.Instance.DeleteFood(foodid))
                     {
                         notitfy.Show("Xóa món ăn thành công!!!");

@@ -117,6 +117,7 @@ CREATE TABLE NHANVIEN
     SDT VARCHAR(12) NULL CHECK (SDT LIKE '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'),
     NGAYVAOLAM DATE NULL,
     LUONGCOBAN DECIMAL(12, 2) NULL DEFAULT 0,
+    DAXOA BIT NOT NULL DEFAULT 0
 
     CONSTRAINT PK_NHANVIEN PRIMARY KEY(MANHANVIEN)
 )
@@ -200,6 +201,7 @@ CREATE TABLE LOAIMONAN
 (
     MALOAIMONAN INT IDENTITY NOT NULL,
     TENLOAIMONAN NVARCHAR(50) NULL UNIQUE,
+    DAXOA BIT NOT NULL DEFAULT 0,
 
     CONSTRAINT PK_LOAIMONAN PRIMARY KEY(MALOAIMONAN)
 )
@@ -213,6 +215,7 @@ CREATE TABLE MONAN
     DVT NVARCHAR(20) NULL,
     DONGIA DECIMAL(10, 2) NULL DEFAULT 0,
     HINHANH NVARCHAR(MAX) NULL,
+    DAXOA BIT NOT NULL DEFAULT 0,
 
     CONSTRAINT PK_MONAN PRIMARY KEY(MAMONAN),
     CONSTRAINT FK_MONAN_LOAIMONAN FOREIGN KEY(MALOAIMONAN) REFERENCES LOAIMONAN(MALOAIMONAN)
@@ -324,13 +327,7 @@ ON LOAIMONAN
 TO nhan_vien
 GO
 
--- Tạo nhóm quyền admin
-EXEC sp_addrole 'admin'
-GO
-
--- Gán db_owner vào nhóm quyền admin
-EXEC sp_addrolemember 'db_owner', 'admin'
-GO
+-- admin có quyền db_owner
 
 
                                     --Thêm dữ liệu--
@@ -344,7 +341,8 @@ GO
 --NGAYVAOLAM DATE NULL,
 --LUONGCOBAN DECIMAL(12, 2) NULL
 INSERT INTO NHANVIEN(MANHANVIEN, HOTEN, PHAI, NGAYSINH, DIACHI, SDT, NGAYVAOLAM, LUONGCOBAN) VALUES
-('NV001', N'Cao Tấn Công', N'Nam', '2003-10-26', N'17B Tân Trụ, TP. HCM', '0362111265', '2023-10-01', 300000)
+('NV001', N'Cao Tấn Công', N'Nam', '2003-10-26', N'17B Tân Trụ, TP. HCM', '0362111265', '2023-10-01', 300000),
+('NV005', N'Thanh Thảo', N'Nữ', '2003-10-26', N'17B Tân Trụ, TP. HCM', '0362111265', '2023-10-01', 100000)
 GO
 --Thêm tài khoản
 --TENDANGNHAP VARCHAR(10) NOT NULL,
@@ -592,7 +590,7 @@ AS
 				-- Tạo user
 				EXEC sp_adduser @userName, @userName
 				-- Thêm user vào nhóm quyền admin
-				EXEC sp_addrolemember 'admin', @userName
+				EXEC sp_addrolemember 'db_owner', @userName
 			END
 		ELSE IF (@permissionGroupId = (SELECT MaNhom FROM NhomQuyen WHERE TenNhom = N'Nhân viên'))
 			BEGIN
@@ -606,15 +604,6 @@ AS
 
         INSERT INTO TAIKHOAN(TENDANGNHAP, MANHANVIEN, TENHIENTHI, MATKHAU, MaNhom, TRANGTHAI) VALUES
         (@userName, @staffid, @displayName, '1962026656160185351301320480154111117132155', @permissionGroupId, @status)
-    END
-GO
-
---Kiểm tra tồn tại của tài khoản dựa vào mã nhân viên
-CREATE PROC USP_AccountExistsByStaffID
-    @staffid VARCHAR(10)
-AS
-    BEGIN
-        SELECT * FROM TAIKHOAN WHERE MANHANVIEN = @staffid
     END
 GO
 
@@ -651,13 +640,13 @@ GO
 CREATE PROC USP_UpdateAccount
     @permissionGroupId INT, 
     @status NVARCHAR(50),
-    @userName VARCHAR(50)
+    @userName VARCHAR(10)
 AS
     BEGIN
 	IF (@permissionGroupId = (SELECT MaNhom FROM NhomQuyen WHERE TenNhom = N'Admin'))
 			BEGIN
 				-- Thêm user vào nhóm quyền admin
-				EXEC sp_addrolemember 'admin', @userName
+				EXEC sp_addrolemember 'db_owner', @userName
 				-- Xóa người dùng khỏi nhóm quyền nhân viên
 				EXEC sp_droprolemember 'nhan_vien', @userName
 			END
@@ -666,7 +655,7 @@ AS
 				-- Thêm user vào nhóm quyền nhân viên
 				EXEC sp_addrolemember 'nhan_vien', @userName
 				-- Xóa người dùng khỏi nhóm quyền admin
-				EXEC sp_droprolemember 'admin', @userName
+				EXEC sp_droprolemember 'db_owner', @userName
 			END
 
         UPDATE TAIKHOAN
@@ -727,7 +716,7 @@ GO
 CREATE PROC USP_GetListEmployee
 AS
     BEGIN
-        SELECT * FROM NHANVIEN
+        SELECT * FROM NHANVIEN WHERE DAXOA = 0
     END
 GO
 
@@ -762,7 +751,9 @@ CREATE PROC USP_DeleteEmployee
     @staffid VARCHAR(10)
 AS
     BEGIN
-        DELETE NHANVIEN WHERE MANHANVIEN = @staffid
+        UPDATE NHANVIEN
+        SET DAXOA = 1
+        WHERE MANHANVIEN = @staffid
     END
 GO
 
@@ -842,7 +833,7 @@ AS
     BEGIN
         SELECT *
         FROM NHANVIEN
-        WHERE [dbo].[fuConvertToUnsign1](HOTEN) LIKE N'%' + [dbo].[fuConvertToUnsign1](@name) + N'%';
+        WHERE [dbo].[fuConvertToUnsign1](HOTEN) LIKE N'%' + [dbo].[fuConvertToUnsign1](@name) + N'%' AND DAXOA = 0;
     END
 GO
 
@@ -851,7 +842,7 @@ CREATE PROC USP_SearchEmployeeBySalary
      @basicsalary DECIMAL(12, 2)
 AS
     BEGIN
-        SELECT * FROM NHANVIEN WHERE LUONGCOBAN = @basicsalary  
+        SELECT * FROM NHANVIEN WHERE LUONGCOBAN = @basicsalary AND DAXOA = 0
     END
 GO
 
@@ -860,7 +851,17 @@ CREATE PROC USP_SearchEmployeeBySex
    @sex NVARCHAR(4)
 AS
     BEGIN
-        SELECT * FROM NHANVIEN WHERE PHAI = @sex
+        SELECT * FROM NHANVIEN WHERE PHAI = @sex AND DAXOA = 0
+    END
+GO
+
+--Tìm nhân viên theo lương và giới tính
+CREATE PROC USP_SearchEmployeeBySalaryAndSex
+    @basicsalary DECIMAL(12, 2),
+    @sex NVARCHAR(4)
+AS
+    BEGIN
+        SELECT * FROM NHANVIEN WHERE PHAI = @sex AND LUONGCOBAN = @basicsalary AND DAXOA = 0
     END
 GO
 
@@ -1014,7 +1015,7 @@ GO
 CREATE PROC USP_GetListFoodCategory
 AS
    BEGIN
-   SELECT * FROM LOAIMONAN
+    SELECT * FROM LOAIMONAN WHERE DAXOA = 0
    END
 GO
 
@@ -1033,7 +1034,9 @@ CREATE PROC USP_DeleteFoodCategory
     @foodcategoryid INT
 AS
     BEGIN
-        DELETE LOAIMONAN WHERE MALOAIMONAN = @foodcategoryid
+        UPDATE LOAIMONAN
+        SET DAXOA = 1
+        WHERE MALOAIMONAN = @foodcategoryid
     END
 GO
 
@@ -1054,7 +1057,7 @@ CREATE PROC USP_SearchFoodByFoodCategoryName
     @foodcategoryid INT
 AS
     BEGIN
-        SELECT * FROM MONAN WHERE MALOAIMONAN = @foodcategoryid
+        SELECT * FROM MONAN WHERE MALOAIMONAN = @foodcategoryid AND DAXOA = 0
     END
 GO
 
@@ -1062,7 +1065,7 @@ GO
 CREATE PROC USP_GetListFood
 AS
     BEGIN
-        SELECT * FROM MONAN
+        SELECT * FROM MONAN WHERE MALOAIMONAN IN (SELECT MALOAIMONAN FROM LOAIMONAN WHERE DAXOA = 0) AND DAXOA = 0
     END
 GO
 
@@ -1078,7 +1081,7 @@ GO
 --Tìm kiếm món ăn
 CREATE FUNCTION UF_SearchFood (@foodName NVARCHAR(100))
 RETURNS TABLE
-    RETURN SELECT * FROM MONAN WHERE TENMONAN LIKE '%' + @foodName + '%'
+    RETURN SELECT * FROM MONAN WHERE TENMONAN LIKE '%' + @foodName + '%' AND DAXOA = 0
 GO
 
 --Tìm kiếm món ăn theo danh mục
@@ -1090,13 +1093,14 @@ RETURNS @FOOD TABLE
                         TENMONAN NVARCHAR(100),
                         DVT NVARCHAR(20),
                         DONGIA DECIMAL(10, 2),
-                        HINHANH NVARCHAR(100)
+                        HINHANH NVARCHAR(100), 
+                        DAXOA BIT
                     )
     BEGIN
         DECLARE @categoryId INT
         SELECT @categoryId = MALOAIMONAN FROM LOAIMONAN WHERE TENLOAIMONAN = @category
         INSERT INTO @FOOD
-        SELECT * FROM MONAN WHERE MALOAIMONAN = @categoryId AND TENMONAN LIKE '%' + @foodName + '%'
+        SELECT * FROM MONAN WHERE MALOAIMONAN = @categoryId AND TENMONAN LIKE '%' + @foodName + '%' AND DAXOA = 0
         RETURN
     END
 GO
@@ -1145,7 +1149,9 @@ CREATE PROC USP_DeleteFood
     @foodid INT
 AS
     BEGIN
-        DELETE MONAN WHERE MAMONAN = @foodid
+        UPDATE MONAN
+        SET DAXOA = 1
+        WHERE MAMONAN = @foodid
     END
 GO
 
@@ -1238,6 +1244,15 @@ CREATE PROC USP_GetFoodRecipesByFoodID
 AS
     BEGIN
         SELECT * FROM CONGTHUC WHERE MAMONAN = @foodid
+    END
+GO
+
+--Xóa món ăn theo loại món ăn
+CREATE PROC USP_DeleteFoodByCategoryID
+    @categoryid INT
+AS
+    BEGIN
+        DELETE MONAN WHERE MALOAIMONAN = @categoryid
     END
 GO
 
@@ -1377,7 +1392,7 @@ AS
     BEGIN
         UPDATE BAN
         SET DAXOA = 1
-        WHERE MABAN = @tableID
+        WHERE MABAN = @tableID 
     END
 GO
 
