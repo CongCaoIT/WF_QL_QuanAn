@@ -542,7 +542,7 @@ namespace QL_QuanAn
             btnUpdate.Enabled = true;
         }
 
-        private void dtgvOrderInfor_CellClick(object sender, DataGridViewCellEventArgs e)
+        private void dtgvOrderInfor_CellClick_1(object sender, DataGridViewCellEventArgs e)
         {
             int row = dtgvOrderInfor.CurrentCell.RowIndex;
 

@@ -327,7 +327,13 @@ ON LOAIMONAN
 TO nhan_vien
 GO
 
--- admin có quyền db_owner
+-- Tạo nhóm quyền admin
+EXEC sp_addrole 'admin'
+GO
+
+-- Gán db_owner vào nhóm quyền admin
+EXEC sp_addrolemember 'db_owner', 'admin'
+GO
 
 
                                     --Thêm dữ liệu--
@@ -535,7 +541,7 @@ INSERT INTO BAN(MAKHUVUC, TENBAN, SOLUONGNGUOI, TRANGTHAI) VALUES
 GO
 
                                      -- Xử lý thủ tục--
-                                        --TÀI KHOẢN--
+                                        --CÔNG: TÀI KHOẢN--
 --Đăng nhập
 CREATE PROC USP_Login 
     @userName nvarchar(100),
@@ -590,7 +596,7 @@ AS
 				-- Tạo user
 				EXEC sp_adduser @userName, @userName
 				-- Thêm user vào nhóm quyền admin
-				EXEC sp_addrolemember 'db_owner', @userName
+				EXEC sp_addrolemember 'admin', @userName
 			END
 		ELSE IF (@permissionGroupId = (SELECT MaNhom FROM NhomQuyen WHERE TenNhom = N'Nhân viên'))
 			BEGIN
@@ -646,7 +652,7 @@ AS
 	IF (@permissionGroupId = (SELECT MaNhom FROM NhomQuyen WHERE TenNhom = N'Admin'))
 			BEGIN
 				-- Thêm user vào nhóm quyền admin
-				EXEC sp_addrolemember 'db_owner', @userName
+				EXEC sp_addrolemember 'admin', @userName
 				-- Xóa người dùng khỏi nhóm quyền nhân viên
 				EXEC sp_droprolemember 'nhan_vien', @userName
 			END
@@ -655,7 +661,7 @@ AS
 				-- Thêm user vào nhóm quyền nhân viên
 				EXEC sp_addrolemember 'nhan_vien', @userName
 				-- Xóa người dùng khỏi nhóm quyền admin
-				EXEC sp_droprolemember 'db_owner', @userName
+				EXEC sp_droprolemember 'admin', @userName
 			END
 
         UPDATE TAIKHOAN
@@ -711,7 +717,7 @@ BEGIN
 END
 GO
 
-                                        --NHÂN VIÊN--
+                                        --CÔNG: NHÂN VIÊN--
 --Lấy danh sách nhân viên
 CREATE PROC USP_GetListEmployee
 AS
@@ -887,7 +893,7 @@ AS
     END
 GO
 
-                                            --CHẤM CÔNG--
+                                            --CÔNG: CHẤM CÔNG--
 --Lấy danh sách chấm công
 CREATE PROC USP_GetListTimeKeeping
 AS
@@ -1010,7 +1016,7 @@ AS
     END
 GO
 
-                                        --LOẠI MÓN ĂN--
+                                        --TIẾN: LOẠI MÓN ĂN--
 --Lấy danh sách món ăn
 CREATE PROC USP_GetListFoodCategory
 AS
@@ -1051,7 +1057,7 @@ AS
     END
 GO
 
-                                        --MÓN ĂN--
+                                        --TIẾN: MÓN ĂN--
 --Tìm món ăn đưa vào mã loại món ăn
 CREATE PROC USP_SearchFoodByFoodCategoryName
     @foodcategoryid INT
@@ -1078,13 +1084,13 @@ AS
     END
 GO
 
---Tìm kiếm món ăn
+--TÀI: Tìm kiếm món ăn
 CREATE FUNCTION UF_SearchFood (@foodName NVARCHAR(100))
 RETURNS TABLE
     RETURN SELECT * FROM MONAN WHERE TENMONAN LIKE '%' + @foodName + '%' AND DAXOA = 0
 GO
 
---Tìm kiếm món ăn theo danh mục
+--TÀI: Tìm kiếm món ăn theo danh mục
 CREATE FUNCTION UF_SearchFoodByCategoty (@foodName NVARCHAR(100), @category NVARCHAR(50))
 RETURNS @FOOD TABLE 
                     (
@@ -1105,7 +1111,7 @@ RETURNS @FOOD TABLE
     END
 GO
 
---Lấy đơn giá theo mã món ăn
+--TÀI: Lấy đơn giá theo mã món ăn
 CREATE PROC USP_GetUnitPriceByFoodId
     @foodId INT
 AS
@@ -1173,7 +1179,7 @@ AS
     END
 GO
 
-                                        --CÔNG THỨC-
+                                        --TIẾN: CÔNG THỨC-
 --Lấy dánh sách công thức
 CREATE PROC USP_GetListFoodRecipes
 AS
@@ -1256,7 +1262,7 @@ AS
     END
 GO
 
-                                        --NGUYÊN LIỆU--
+                                        --TIẾN: NGUYÊN LIỆU--
 --Lấy danh sách nguyên liệu
 CREATE PROC USP_GetListIngredient
 AS
@@ -1305,7 +1311,7 @@ AS
     END
 GO
 
-                                        --BÀN ĂN--
+                                        --HUY: BÀN ĂN--
 --Lấy danh sách bàn
 CREATE PROC USP_GetListTable
 AS
@@ -1339,7 +1345,7 @@ AS
         SELECT TRANGTHAI FROM BAN WHERE MABAN = @tableId
     END
 GO
---Cập nhật trạng trái của bàn
+--TÀI: Cập nhật trạng trái của bàn
 CREATE PROC USP_UpdateStatusTable
     @tableId INT, @status NVARCHAR(255)
 AS
@@ -1396,7 +1402,7 @@ AS
     END
 GO
 
-                                        --KHU VỰC BÀN ĂN--
+                                        --HUY: KHU VỰC BÀN ĂN--
 --Lấy danh sách vùng
 CREATE PROC USP_GetListArea
 AS
@@ -1478,7 +1484,7 @@ AS
     END
 GO
 
-                                        --HÓA ĐƠN--
+                                        --TÀI: HÓA ĐƠN--
 --Lấy hóa đơn theo bàn
 CREATE PROC USP_GetBillByTable
     @tableId INT
@@ -1537,7 +1543,7 @@ GO
                                      -- Xử lý Trigger--
                                         --Chấm công--
 
---Kiểm tra (NGAYVAOLAM) của nhân viên phải lớn hơn ngày sinh (NGAYSINH)
+--TIẾN: Kiểm tra (NGAYVAOLAM) của nhân viên phải lớn hơn ngày sinh (NGAYSINH)
 CREATE TRIGGER CheckEmploymentStartDate
 ON NHANVIEN
 AFTER INSERT, UPDATE
@@ -1569,7 +1575,7 @@ BEGIN
 END
 GO
 
---Cập nhật lương cơ bản của nhân viên khi thay đổi chức vụ
+--CÔNG: Cập nhật lương cơ bản của nhân viên khi thay đổi chức vụ
 CREATE TRIGGER Tr_UpdateSalaryOnPositionChange
 ON TAIKHOAN
 AFTER UPDATE
@@ -1590,7 +1596,7 @@ BEGIN
 END;
 GO
 
---Kiểm tra ngày vào phải nhỏ hơn ngày ra của hóa đơn
+--TÀI: Kiểm tra ngày vào phải nhỏ hơn ngày ra của hóa đơn
 CREATE TRIGGER Tr_EnforceValidDateRange
 ON HOADON
 AFTER UPDATE
@@ -1600,15 +1606,13 @@ BEGIN
     BEGIN
         DECLARE @CountInvalidDates INT
 
-        -- Tạo bảng tạm thời để lưu trữ các dòng không hợp lệ
         CREATE TABLE #InvalidDates (MAHOADON INT)
 
-        -- Kiểm tra ngày vào phải nhỏ hơn ngày ra cho các dòng được thêm hoặc cập nhật
         INSERT INTO #InvalidDates (MAHOADON)
         SELECT I.MAHOADON
         FROM inserted AS I
         INNER JOIN HOADON AS H ON I.MAHOADON = H.MAHOADON
-        WHERE I.NGAYVAO > I.NGAYRA
+        WHERE H.NGAYVAO > I.NGAYRA
 
         -- Đếm số lượng dòng không hợp lệ
         SELECT @CountInvalidDates = COUNT(*) FROM #InvalidDates
@@ -1625,7 +1629,7 @@ BEGIN
 END
 GO
 
---Cập nhật ngày ra cho hóa đơn khi cập nhật tổng tiền
+--TÀI: Cập nhật ngày ra cho hóa đơn khi cập nhật tổng tiền
 CREATE TRIGGER UpdateDateOut
 ON HOADON
 FOR UPDATE
@@ -1638,7 +1642,7 @@ BEGIN
 END
 GO
 
---Số lượng chỗ ngồi khi thêm bàn ăn phải lớn hơn 0
+--HUY: Số lượng chỗ ngồi khi thêm bàn ăn phải lớn hơn 0
 CREATE TRIGGER TR_CheckQuanlityPeople
 ON BAN
 AFTER INSERT

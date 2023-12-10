@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Serialization;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 namespace QL_QuanAn
 {
@@ -343,25 +344,48 @@ namespace QL_QuanAn
                 return;
             }
 
-            Add = false;
+            if (loginAcc.UserName.Equals(txbUserName.Text))
+            {
+                Add = false;
+                groupControlGrantPermissions.Enabled = false;
+                btnAdd.Enabled = false;
+                btnEdit.Enabled = false;
+                btnDelete.Enabled = false;
 
-            btnAdd.Enabled = false;
-            btnEdit.Enabled = false;
-            btnDelete.Enabled = false;
+                txbUserName.Enabled = false;
+                cbStaffID.Enabled = false;
+                cbStaffName.Enabled = false;
+                btnResetPassWord.Enabled = false;
 
-            txbUserName.Enabled = false;
-            cbStaffID.Enabled = false;
-            cbStaffName.Enabled = false;
-            btnResetPassWord.Enabled = false;
+                btnReload.Enabled = true;
+                btnSave.Enabled = true;
+                btnRemove.Enabled = true;
+                cbStatus.Enabled = true;
+                LoadStaffIDIntoCombobox(cbStaffID);
+                LoadStaffNameIntoCombobox(cbStaffName);
+            }
+            else
+            {
+                Add = false;
 
-            btnReload.Enabled = true;
-            btnSave.Enabled = true;
-            btnRemove.Enabled = true;
-            cbStatus.Enabled = true;
-            groupControlGrantPermissions.Enabled = true;
+                btnAdd.Enabled = false;
+                btnEdit.Enabled = false;
+                btnDelete.Enabled = false;
 
-            LoadStaffIDIntoCombobox(cbStaffID);
-            LoadStaffNameIntoCombobox(cbStaffName);
+                txbUserName.Enabled = false;
+                cbStaffID.Enabled = false;
+                cbStaffName.Enabled = false;
+                btnResetPassWord.Enabled = false;
+
+                btnReload.Enabled = true;
+                btnSave.Enabled = true;
+                btnRemove.Enabled = true;
+                cbStatus.Enabled = true;
+                groupControlGrantPermissions.Enabled = true;
+
+                LoadStaffIDIntoCombobox(cbStaffID);
+                LoadStaffNameIntoCombobox(cbStaffName);
+            }          
         }
 
         private void btnReload_Click(object sender, EventArgs e)

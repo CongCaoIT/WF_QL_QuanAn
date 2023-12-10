@@ -34,7 +34,6 @@ namespace QL_QuanAn
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
             this.groupControl4 = new DevExpress.XtraEditors.GroupControl();
             this.dtgvOrderInfor = new System.Windows.Forms.DataGridView();
             this.btnDelete = new DevExpress.XtraEditors.SimpleButton();
@@ -113,6 +112,7 @@ namespace QL_QuanAn
             this.dtgvOrderInfor.RowTemplate.Height = 40;
             this.dtgvOrderInfor.Size = new System.Drawing.Size(449, 337);
             this.dtgvOrderInfor.TabIndex = 15;
+            this.dtgvOrderInfor.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dtgvOrderInfor_CellClick_1);
             // 
             // btnDelete
             // 
@@ -385,14 +385,6 @@ namespace QL_QuanAn
             this.dtgvFoods.Location = new System.Drawing.Point(3, 58);
             this.dtgvFoods.Name = "dtgvFoods";
             this.dtgvFoods.ReadOnly = true;
-            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle4.Font = new System.Drawing.Font("Tahoma", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle4.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle4.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dtgvFoods.RowHeadersDefaultCellStyle = dataGridViewCellStyle4;
             this.dtgvFoods.RowHeadersVisible = false;
             this.dtgvFoods.RowHeadersWidth = 51;
             this.dtgvFoods.RowTemplate.Resizable = System.Windows.Forms.DataGridViewTriState.True;
