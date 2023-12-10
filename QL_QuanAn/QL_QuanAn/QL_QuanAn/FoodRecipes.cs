@@ -379,19 +379,26 @@ namespace QL_QuanAn
             {
                 notitfy.Show("Vui lòng chọn nguyên liệu cần xóa!!!");
                 return;
-            }
+            }   
 
-            int ingerdientid = int.Parse(txbIngredirentID.Text);
+            try
+            {
+                int ingerdientid = int.Parse(txbIngredirentID.Text);
 
-            if (IngredientDAO.Instance.DeleteIngredient(ingerdientid))
-            {
-                notitfy.Show("Xóa nguyên liệu thành công!!!");
-                LoadListIngredient();
-                LoadIngredientNameIntoCombobox(cbIngredients);
+                if (IngredientDAO.Instance.DeleteIngredient(ingerdientid))
+                {
+                    notitfy.Show("Xóa nguyên liệu thành công!!!");
+                    LoadListIngredient();
+                    LoadIngredientNameIntoCombobox(cbIngredients);
+                }
+                else
+                {
+                    notitfy.Show("Xóa nguyên liệu thất bại!!!");
+                }
             }
-            else
+            catch 
             {
-                notitfy.Show("Xóa nguyên liệu thất bại!!!");
+                notitfy.Show("Nguyên liệu không thể xóa vì nó có trong món ăn!!!");
             }
         }
 
@@ -576,7 +583,21 @@ namespace QL_QuanAn
                 catch { }
             }
         }
+
         private void btnReload_Click(object sender, EventArgs e)
+        {
+            LoadListIngredient();
+            LoadFoodRecipes();
+
+            btnAdd.Enabled = true;
+            btnDelete.Enabled = true;
+            btnEdit.Enabled = true;
+
+            btnSaveIngredient.Enabled = false;
+            btnRemoveIngredient.Enabled = false;
+        }
+
+        private void btnRemove_Click(object sender, EventArgs e)
         {
             LoadListIngredient();
             LoadFoodRecipes();

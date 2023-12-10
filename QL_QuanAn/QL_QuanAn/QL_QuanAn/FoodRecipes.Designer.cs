@@ -217,6 +217,7 @@
             this.btnRemove.Size = new System.Drawing.Size(95, 36);
             this.btnRemove.TabIndex = 17;
             this.btnRemove.Text = "Hủy";
+            this.btnRemove.Click += new System.EventHandler(this.btnRemove_Click);
             // 
             // btnDelete
             // 
