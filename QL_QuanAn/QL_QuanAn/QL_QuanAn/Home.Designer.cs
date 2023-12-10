@@ -72,7 +72,6 @@
             // 
             // ribbon
             // 
-            this.ribbon.EmptyAreaImageOptions.ImagePadding = new System.Windows.Forms.Padding(35, 37, 35, 37);
             this.ribbon.ExpandCollapseItem.Id = 0;
             this.ribbon.Items.AddRange(new DevExpress.XtraBars.BarItem[] {
             this.ribbon.ExpandCollapseItem,
@@ -100,10 +99,8 @@
             this.btnRecipes,
             this.btnBillByStaffid});
             this.ribbon.Location = new System.Drawing.Point(0, 0);
-            this.ribbon.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.ribbon.MaxItemId = 27;
             this.ribbon.Name = "ribbon";
-            this.ribbon.OptionsMenuMinWidth = 385;
             this.ribbon.Pages.AddRange(new DevExpress.XtraBars.Ribbon.RibbonPage[] {
             this.ribbonPage1,
             this.ribbonPageManament,
@@ -111,7 +108,7 @@
             this.ribbon.QuickToolbarItemLinks.Add(this.ItemUserName);
             this.ribbon.QuickToolbarItemLinks.Add(this.ItemGrantPermissions);
             this.ribbon.QuickToolbarItemLinks.Add(this.ItemDisplayName);
-            this.ribbon.Size = new System.Drawing.Size(1468, 209);
+            this.ribbon.Size = new System.Drawing.Size(1258, 177);
             // 
             // ItemUserName
             // 
@@ -410,13 +407,12 @@
             // 
             // Home
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1468, 1019);
+            this.ClientSize = new System.Drawing.Size(1258, 828);
             this.Controls.Add(this.ribbon);
             this.IconOptions.Image = global::QL_QuanAn.Properties.Resources.logo;
             this.IsMdiContainer = true;
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.MaximumSize = new System.Drawing.Size(1470, 1020);
             this.MinimumSize = new System.Drawing.Size(1260, 829);
             this.Name = "Home";

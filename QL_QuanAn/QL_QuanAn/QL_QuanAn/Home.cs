@@ -240,7 +240,7 @@ namespace QL_QuanAn
 
         private void btnExit_ItemClick(object sender, ItemClickEventArgs e)
         {
-            Application.Exit();
+            this.Close();
         }
         private void btnBillByStaffid_ItemClick(object sender, ItemClickEventArgs e)
         {
